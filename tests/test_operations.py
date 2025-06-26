@@ -20,7 +20,6 @@ from app.operations import (
     # Uses the attributes (operation_class, valid_test_cases, etc.) defined in TestPower
     # Executes those inherited test methods using the data provided in TestPower
 
-
 class TestOperation: # temporary base class
     """Test base Operation class functionality."""
 
@@ -64,25 +63,6 @@ class BaseOperationTest:
 
             with pytest.raises(error, match=error_message):
                 operation.execute(a, b)
-
-
-# class TestMultiplication(BaseOperationTest):
-#     """Test Multiplication operation."""
-
-#     operation_class = Multiplication
-#     valid_test_cases = {
-#         "positive_numbers": {"a": "5", "b": "3", "expected": "15"},
-#         "negative_numbers": {"a": "-5", "b": "-3", "expected": "15"},
-#         "mixed_signs": {"a": "-5", "b": "3", "expected": "-15"},
-#         "multiply_by_zero": {"a": "5", "b": "0", "expected": "0"},
-#         "decimals": {"a": "5.5", "b": "3.3", "expected": "18.15"},
-#         "large_numbers": {
-#             "a": "1e5",
-#             "b": "1e5",
-#             "expected": "10000000000"
-#         },
-#     }
-#     invalid_test_cases = {}  # Multiplication has no invalid cases
 
 
 # inherits from BaseOperationTest
@@ -133,6 +113,7 @@ class TestRoot(BaseOperationTest):
         },
     }
 
+
 class TestModulus(BaseOperationTest):
     """Test Modulus operation"""
 
@@ -151,6 +132,7 @@ class TestModulus(BaseOperationTest):
             "message": "Cannot compute modulus operation, divisor cannot be zero"
         },
     }
+
 
 class TestIntegerDivision(BaseOperationTest):
     """Test Integer Division operation."""
@@ -173,46 +155,99 @@ class TestIntegerDivision(BaseOperationTest):
         },
     }
 
-# class TestOperationFactory:
-#     """Test OperationFactory functionality."""
 
-#     def test_create_valid_operations(self):
-#         """Test creation of all valid operations."""
-#         operation_map = {
-#             'add': Addition,
-#             'subtract': Subtraction,
-#             'multiply': Multiplication,
-#             'divide': Division,
-#             'power': Power,
-#             'root': Root,
-#         }
+class TestPercentageCalculation(BaseOperationTest):
+    """Test Percentage Calculation operation"""
 
-#         for op_name, op_class in operation_map.items():
-#             operation = OperationFactory.create_operation(op_name)
-#             assert isinstance(operation, op_class)
-#             # Test case-insensitive
-#             operation = OperationFactory.create_operation(op_name.upper())
-#             assert isinstance(operation, op_class)
+    operation_class = PercentageCalculation
+    valid_test_cases = {
+        "simple_percentage": {"a": "50", "b": "200", "expected": "25"},
+        "full_percentage": {"a": "75", "b": "75", "expected": "100"},
+        "decimal_result": {"a": "5", "b": "8", "expected": "62.5"},
+        "decimal_inputs": {"a": "2.5", "b": "10", "expected": "25"},
+        "large_values": {"a": "100000", "b": "500000", "expected": "20"},
+        "zero_numerator": {"a": "0", "b": "100", "expected": "0"},
+    }
+    invalid_test_cases = {
+        "divide_by_zero": {
+            "a": "100",
+            "b": "0",
+            "error": ValidationError,
+            "message": "Cannot compute percentage calculation operation, divisor cannot be zero"
+        },
+    }
 
-#     def test_create_invalid_operation(self):
-#         """Test creation of invalid operation raises error."""
-#         with pytest.raises(ValueError, match="Unknown operation: invalid_op"):
-#             OperationFactory.create_operation("invalid_op")
 
-#     def test_register_valid_operation(self):
-#         """Test registering a new valid operation."""
-#         class NewOperation(Operation):
-#             def execute(self, a: Decimal, b: Decimal) -> Decimal:
-#                 return a
+class TestAbsoluteDifference(BaseOperationTest):
+    """Test Absolute Difference operation"""
 
-#         OperationFactory.register_operation("new_op", NewOperation)
-#         operation = OperationFactory.create_operation("new_op")
-#         assert isinstance(operation, NewOperation)
+    operation_class = AbsoluteDifference
+    valid_test_cases = {
+        "positive_numbers": {"a": "8", "b": "5", "expected": "3"},
+        "reverse_order": {"a": "5", "b": "8", "expected": "3"},
+        "negative_numbers": {"a": "-7", "b": "-2", "expected": "5"},
+        "mixed_signs_1": {"a": "-4", "b": "6", "expected": "10"},
+        "mixed_signs_2": {"a": "10", "b": "-5", "expected": "15"},
+        "same_values": {"a": "9", "b": "9", "expected": "0"},
+        "decimals": {"a": "5.5", "b": "2.2", "expected": "3.3"},
+    }
 
-#     def test_register_invalid_operation(self):
-#         """Test registering an invalid operation class raises error."""
-#         class InvalidOperation:
-#             pass
+    invalid_test_cases = {}  # Absolute Difference has no invalid cases
 
-#         with pytest.raises(TypeError, match="Operation class must inherit"):
-#             OperationFactory.register_operation("invalid", InvalidOperation)
+
+class TestOperationFactory:
+    """Test OperationFactory functionality."""
+
+    def test_create_valid_operations(self):
+        """Test creation of all valid operations."""
+        operation_map = {
+            'power': Power,
+            'root': Root,
+            'modulus': Modulus,
+            'integer-division': IntegerDivision,
+            'percentage-calculation': PercentageCalculation,
+            'absolute-difference': AbsoluteDifference
+        }
+
+        # op_name is the string name like "power"
+        # op_class is the corresponding class like Power
+        for op_name, op_class in operation_map.items():
+            operation = OperationFactory.create_operation(op_name)
+
+            # Checks that the returned object is an instance of the correct class
+            assert isinstance(operation, op_class)
+
+            # Test case-insensitive
+            operation = OperationFactory.create_operation(op_name.upper())
+            assert isinstance(operation, op_class)
+
+    # testing creating an invalid operation "invalid_op"
+    def test_create_invalid_operation(self):
+        """Test creation of invalid operation raises error."""
+        with pytest.raises(ValueError, match="Unknown operation: invalid_op"):
+            OperationFactory.create_operation("invalid_op")
+
+
+    # successfully register and create a new operation dynamically.
+    # create and define new operation
+    # register it in the dictionary
+    # creates new instance of new_op in variable operation
+    # checks if operation is an instance of NewOperation class
+    def test_register_valid_operation(self):
+        """Test registering a new valid operation."""
+        class NewOperation(Operation):
+            def execute(self, a: Decimal, b: Decimal) -> Decimal:
+                return a
+
+        OperationFactory.register_operation("new_op", NewOperation)
+        operation = OperationFactory.create_operation("new_op")
+        assert isinstance(operation, NewOperation)
+
+    # invalid operation, has to inherit from Operation class
+    def test_register_invalid_operation(self):
+        """Test registering an invalid operation class raises error."""
+        class InvalidOperation:
+            pass
+
+        with pytest.raises(TypeError, match="Operation class must inherit"):
+            OperationFactory.register_operation("invalid", InvalidOperation)
