@@ -20,9 +20,6 @@ Version: 1.0
 """
 
 
-
-
-
 from app.calculator_repl import calculator_repl
 
 
