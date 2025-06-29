@@ -100,4 +100,155 @@ class Calculation:
 
         raise OperationError("Negative exponents are not supported")
     
+    @staticmethod
+    def _raise_invalid_root(x: Decimal, y: Decimal): # pragma: no cover
+        """
+        This method is called when an invalid root operation is attempted, such as
+        taking the root of a negative number or using zero as the root degree
+
+        Arguments:
+            x: number from which the root is taken
+            y: degree of the root
+        """
+
+        if y == 0:
+            raise OperationError("Zero root is undefined")
+        if x < 0:
+            raise OperationError("Cannot calculate root of negative number")
+        raise OperationError("Invalid root operation")
     
+    # convert to dictionary form to put into excel history log
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Convert calculation to dictionary for serialization. This method
+        transforms the Calculation instance into a dictionary format,
+        facilitating easy storage and retrieval (saving to a file)
+        """
+
+        return {
+            'operation': self.operation,
+            'operand1': str(self.operand1),
+            'operand2': str(self.operand2),
+            'result': str(self.result),
+            'timestamp': self.timestamp.isoformat()
+        }
+    
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> 'Calculation':
+        """
+        Create calculation from dictionary. This method reconstructs a Calculation instance from
+        a dictionary, ensuring that all required fields are present and correctly formatted.
+
+        Arguments:
+            data (Dict[str, Any]): dictionary containing calculation data
+
+        Returns:
+            Calculation: a new instance of Calculation with data populated from the dictionary
+
+        Raises:
+            OperationError: if data is invalid or missing required fields
+        """
+
+        try:
+            # create Calculation object with original operands
+            calc = Calculation(
+                operation=data['operation'],
+                operand1=Decimal(data['operand1']),
+                operand2=Decimal(data['operand2']),
+            )
+
+            # set the timestamp from the saved data
+            # converts a timestamp string back into a datetime object 
+                # so your code can work with it like a real date/time.
+            calc.timestamp = datetime.datetime.fromisoformat(data['timestamp'])
+
+            # verify the result matches (help catch data corruption)
+            # Is the result I just calculated (calc.result) different from the one we previously saved?
+            saved_result = Decimal(data['result'])
+            if calc.result != saved_result:
+                logging.warning(
+                    f"Loaded calculation result {saved_result} "
+                    f"differs from computed result {calc.result}"
+                ) # pragma: no cover
+
+            return calc
+        
+        except(KeyError, InvalidOperation, ValueError) as e:
+            raise OperationError(f"Invalid calculation data: {str(e)}")
+        
+    def __str__(self) -> str:
+        """
+        Return string representation of calculation.
+
+        Provides a human-readable representation of the calculation, showing the
+        operation performed and its result.
+
+        Returns:
+            str: Formatted string showing the calculation and result.
+        """
+        return f"{self.operation}({self.operand1}, {self.operand2}) = {self.result}"
+    
+    # "How should this object look when printed in the console or logs?"
+    def __repr__(self) -> str:
+        """
+        Return detailed string representation of calculation.
+
+        Provides a detailed and unambiguous string representation of the Calculation
+        instance, useful for debugging.
+
+        Returns:
+            str: Detailed string showing all calculation attributes.
+        """
+       
+        return (
+            f"Calculation(operation='{self.operation}', "
+            f"operand1={self.operand1}, "
+            f"operand2={self.operand2}, "
+            f"result={self.result}, "
+            f"timestamp='{self.timestamp.isoformat()}')"
+        )
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Check if two calculations are equal.
+
+        Compares two Calculation instances to determine if they represent the same
+        operation with identical operands and results.
+
+        Args:
+            other (object): Another calculation to compare with.
+
+        Returns:
+            bool: True if calculations are equal, False otherwise.
+        """
+
+        # checks if other is an instance of Calculation
+        if not isinstance(other, Calculation):
+            return NotImplemented
+        return (
+            self.operation == other.operation and
+            self.operand1 == other.operand1 and
+            self.operand2 == other.operand2 and
+            self.result == other.result
+        )
+    
+    def format_result(self, precision: int = 10) -> str:
+        """
+        Format the calculation result with specified precision.
+
+        This method formats the result to a fixed number of decimal places,
+        removing any trailing zeros for a cleaner presentation.
+
+        Args:
+            precision (int, optional): Number of decimal places to show. Defaults to 10.
+
+        Returns:
+            str: Formatted string representation of the result.
+        """
+        try:
+            # remove trailing zeros and format to specified precision
+            return str(self.result.normalize().quantize(
+                Decimal('0.' + '0' * precision)
+            ).normalize())
+        except InvalidOperation: # pragma: no cover
+            return str(self.result)
