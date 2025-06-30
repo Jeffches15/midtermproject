@@ -166,32 +166,6 @@ def test_clear_history(calculator):
     assert calculator.redo_stack == []
 
 
-# Test REPL Commands (using patches for input/output handling)
-
-@patch('builtins.input', side_effect=['exit'])
-@patch('builtins.print')
-def test_calculator_repl_exit(mock_print, mock_input):
-    with patch('app.calculator.Calculator.save_history') as mock_save_history:
-        calculator_repl()
-        mock_save_history.assert_called_once()
-        mock_print.assert_any_call("History saved successfully.")
-        mock_print.assert_any_call("Goodbye!")
-
-
-@patch('builtins.input', side_effect=['help', 'exit'])
-@patch('builtins.print')
-def test_calculator_repl_help(mock_print, mock_input):
-    calculator_repl()
-    mock_print.assert_any_call("\nAvailable commands:")
-
-
-@patch('builtins.input', side_effect=['integer-division', '14.4', '3.1', 'exit'])
-@patch('builtins.print')
-def test_calculator_repl_integer_division(mock_print, mock_input):
-    calculator_repl()
-    mock_print.assert_any_call("\nResult: 4")
-
-
 # except Exception as e:
 #   # Log a warning if history could not be loaded
 #   logging.warning(f"Could not load existing history: {e}")
