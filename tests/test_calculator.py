@@ -37,7 +37,7 @@ def calculator():
             
             # Return an instance of Calculator with the mocked config
             yield Calculator(config=config)
-            
+
 
 # Test Calculator Initialization
 def test_calculator_initialization(calculator):
@@ -94,3 +94,101 @@ def test_perform_operation_validation_error(calculator):
 def test_perform_operation_operation_error(calculator):
     with pytest.raises(OperationError, match="No operation set"):
         calculator.perform_operation(3, 8)
+
+
+# Test Undo/Redo Functionality
+
+def test_undo(calculator):
+    operation = OperationFactory.create_operation('power')
+    calculator.set_operation(operation)
+    calculator.perform_operation(2, 5)
+    calculator.undo()
+    assert calculator.history == []
+
+def test_redo(calculator):
+    operation = OperationFactory.create_operation('power')
+    calculator.set_operation(operation)
+    calculator.perform_operation(2, 5)
+    calculator.undo()
+    calculator.redo()
+    assert len(calculator.history) == 1
+
+
+# Test History Management
+
+@patch('app.calculator.pd.DataFrame.to_csv')
+def test_save_history(mock_to_csv, calculator):
+    operation = OperationFactory.create_operation('root')
+    calculator.set_operation(operation)
+    calculator.perform_operation(16, 4)
+    calculator.save_history()
+    mock_to_csv.assert_called_once()
+
+
+
+@patch('app.calculator.pd.read_csv')
+@patch('app.calculator.Path.exists', return_value=True)
+def test_load_history(mock_exists, mock_read_csv, calculator):
+    # Mock CSV data to match the expected format in from_dict
+    # So when calculator.load_history() runs and tries to read the CSV, 
+        # it receives that fake DataFrame as if it had been read from a real file.
+    mock_read_csv.return_value = pd.DataFrame({
+        'operation': ['Power'],
+        'operand1': ['2'],
+        'operand2': ['5'],
+        'result': ['32'],
+        'timestamp': [datetime.datetime.now().isoformat()]
+    })
+    
+    # Test the load_history functionality
+    try:
+        calculator.load_history()
+        # Verify history length after loading
+        assert len(calculator.history) == 1
+        # Verify the loaded values
+        assert calculator.history[0].operation == "Power"
+        assert calculator.history[0].operand1 == Decimal("2")
+        assert calculator.history[0].operand2 == Decimal("5")
+        assert calculator.history[0].result == Decimal("32")
+    except OperationError:
+        pytest.fail("Loading history failed due to OperationError")
+
+
+# Test Clearing History
+
+def test_clear_history(calculator):
+    operation = OperationFactory.create_operation('power')
+    calculator.set_operation(operation)
+    calculator.perform_operation(2, 6)
+    calculator.clear_history()
+    assert calculator.history == []
+    assert calculator.undo_stack == []
+    assert calculator.redo_stack == []
+
+
+# Test REPL Commands (using patches for input/output handling)
+
+@patch('builtins.input', side_effect=['exit'])
+@patch('builtins.print')
+def test_calculator_repl_exit(mock_print, mock_input):
+    with patch('app.calculator.Calculator.save_history') as mock_save_history:
+        calculator_repl()
+        mock_save_history.assert_called_once()
+        mock_print.assert_any_call("History saved successfully.")
+        mock_print.assert_any_call("Goodbye!")
+
+
+@patch('builtins.input', side_effect=['help', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_help(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("\nAvailable commands:")
+
+
+@patch('builtins.input', side_effect=['integer-division', '14.4', '3.1', 'exit'])
+@patch('builtins.print')
+def test_calculator_repl_integer_division(mock_print, mock_input):
+    calculator_repl()
+    mock_print.assert_any_call("\nResult: 4")
+
+
