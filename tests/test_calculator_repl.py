@@ -4,6 +4,7 @@ import pytest
 
 from app.calculator_repl import calculator_repl
 from app.exceptions import OperationError, ValidationError
+from colorama import Fore, init, Style
 
 # This simulates the user typing "exit" to quit the REPL.
 @patch('builtins.input', side_effect=['exit'])
@@ -22,8 +23,8 @@ def test_calculator_repl_exit(mock_print, mock_input):
             # Print "Goodbye!"
         calculator_repl()
         mock_save_history.assert_called_once() # checks that the history was saved exactly once.
-        mock_print.assert_any_call("History saved successfully.") # verifies the success message is printed.
-        mock_print.assert_any_call("Goodbye!") # verifies the goodbye message is printed.
+        mock_print.assert_any_call(Fore.GREEN + "History saved successfully.") # verifies the success message is printed.
+        mock_print.assert_any_call(Fore.WHITE + "Goodbye!") # verifies the goodbye message is printed.
 
 # inputs are help, then exit
 @patch('builtins.input', side_effect=['help', 'exit'])
@@ -32,15 +33,15 @@ def test_calculator_repl_help(mock_print, mock_input):
     calculator_repl()
     # This confirms that somewhere during the REPL session, the help message that 
         # begins with "\nAvailable commands:" was printed, showing that the 'help' command was handled correctly.
-    mock_print.assert_any_call("\nAvailable commands:")
+    mock_print.assert_any_call(Fore.LIGHTMAGENTA_EX + "\nAvailable commands:")
 
 # inputs are power, 2, 3, exit
 @patch('builtins.input', side_effect=['power', '2', '3', 'exit'])
 @patch('builtins.print')
-def test_calculator_repl_addition(mock_print, mock_input):
+def test_calculator_repl_power(mock_print, mock_input):
     calculator_repl()
     # confirms that somewhere during REPL session, Result: 8 was printed
-    mock_print.assert_any_call("\nResult: 8")
+    mock_print.assert_any_call(Fore.GREEN + "\nResult: 8")
 
 # except Exception as e:
     # print(f"Warning: Could not save history: {e}")
@@ -344,7 +345,7 @@ def test_fatal_error_during_initialization(capsys):
         assert "Fatal error: Initialization failed" in out
 
         # Check logging.error called with expected message
-        mock_logging.error.assert_called_with("fatal error in calculator REPL: Initialization failed")
+        mock_logging.error.assert_called_with(Fore.RED +"fatal error in calculator REPL: Initialization failed")
 
         # Check exception re-raised with correct message
         assert "Initialization failed" in str(exc_info.value)
