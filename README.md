@@ -1,7 +1,110 @@
 # 📦 This is my midterm project!
 
+# This app is a calculator App that provides results for the following operations:
+   - power
+   - root
+   - integer division
+   - percentage calculation
+   - absolute difference
+   - modulus
 
----
+   ## Other features
+   - log of calculation inputs/dates/messages is stored in calculator.log
+   - log of calculation history is stored in calculator_history.cvs
+   - undo/redo calculations
+   - save calculation history to csv file
+   - load calculation history from csv file
+   - display calculation history
+   - clear calculation history
+   - color coded output using colorama!
+      - green: success messages or calculation results
+      - yellow: informational messages
+      - red: error/exception messages
+      - magenta: show available commands
+
+
+# Installation Instructions:
+   1: git clone git@github.com:Jeffches15/midtermproject.git
+   2: navigate to directory where the project was cloned (cd commands)
+   3: python3 -m venv venv: creates virtual environment named venv.
+      - we use virtual environments to keep program isolated with its own packages/dependencies
+   4: source venv/bin/activate: activates venv
+   5: navigate to the directory where requirements.txt is located and run: pip install -r requirements.txt
+   6: run code . to open project in Visual Studio Code
+
+# Setting up .env file:
+   1: in main project directory, create a file called .env (touch .env)
+   2: add .env to gitignore file (so it isnt pushed to GitHub)
+   3: refer to calculator_config.py for .env variable names. For security reasons, I will not list the contents of this file here
+   4: if some variables are not included in .env, calculator_config.py will set default values
+
+# 🔥 Useful Commands Cheat Sheet
+
+| Action                         | Command                                          |
+| ------------------------------- | ------------------------------------------------ |
+| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
+| Install Git                     | `brew install git` or Git for Windows installer |
+| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
+| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
+| Clone Repository                | `git clone <repo-url>`                          |
+| Create Virtual Environment     | `python3 -m venv venv`                           |
+| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
+| Install Python Packages        | `pip install -r requirements.txt`               |
+| Build Docker Image              | `docker build -t <image-name> .`                |
+| Run Docker Container            | `docker run -it --rm <image-name>`               |
+| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
+
+# Other useful Command Line Interface commands:
+
+- ls: List files in a directory (dir in CMD)
+- cd:	Change directory
+- pwd: Show current directory
+- mkdir foldername: Create a new directory
+- touch filename: Create a new file (New-Item in PowerShell)
+- rm filename: Delete a file (del in CMD)
+- rm -r foldername: Delete a folder and its contents
+- cp source dest: Copy files or directories
+- mv old new: Move or rename files/folders
+
+# Other useful git commands:
+
+- git init: Initialize a Git repo
+- git clone URL: Clone a repo
+- git status: See current repo status
+- git add . : Stage all changes
+- git commit -m "message": Commit changes
+- git push: Push to remote repo
+- git pull: Pull latest changes
+- git checkout branchname: Switch branches
+
+# Testing instructions:
+- create a directory called tests
+- in this tests directory, create files starting with "test_" then the name of the file you want to write tests for
+   - ex: test_calculation.py to test functionality in calculation.py
+- the methods in these files have to start with "test_" as well
+   - ex: if you are testing for an invalid root -> test_invalid_root method name
+- after writing some tests, run pytest command in terminal
+- if you want to run pytest for only one file (test_config.py):
+   - pytest tests/test_config.py 
+- if you want to run pytest for one method in a file (test_invalid_precision):
+   - pytest tests/test_config.py::test_invalid_precision
+- make sure the Cover says 100% and there is nothing listed under Missing
+   - Missing lists the line numbers that are not "tested"
+
+# GitHub Actions:
+- GitHub actions is GitHub's CI/CD approach used for automating work flows
+- Purpose:
+   - Automate testing
+   - Build and deploy apps
+   - Enforce code quality
+   - Manage workflows
+- python-app.yml is the file incorporating GitHub actions
+- Some of the configuration in python-app.yml include:
+   - setting Python version to 3.11
+   - runs tests on pull/push to main branch
+   - Install dependencies from requirements.txt
+   - Run tests with pytest and enforce 90% coverage
+
 
 # 🧩 1. Install Homebrew (Mac Only)
 
@@ -226,24 +329,6 @@ git push origin main
 ```
 
 Then submit the GitHub repository link as instructed.
-
----
-
-# 🔥 Useful Commands Cheat Sheet
-
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
 
 ---
 
