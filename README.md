@@ -56,26 +56,26 @@
 
 # Other useful Command Line Interface commands:
 
-- ls: List files in a directory (dir in CMD)
-- cd:	Change directory
-- pwd: Show current directory
-- mkdir foldername: Create a new directory
-- touch filename: Create a new file (New-Item in PowerShell)
-- rm filename: Delete a file (del in CMD)
-- rm -r foldername: Delete a folder and its contents
-- cp source dest: Copy files or directories
-- mv old new: Move or rename files/folders
+- **ls**: List files in a directory (`dir` in CMD)  
+- **cd**: Change directory  
+- **pwd**: Show current directory  
+- **mkdir foldername**: Create a new directory  
+- **touch filename**: Create a new file (`New-Item` in PowerShell)  
+- **rm filename**: Delete a file (`del` in CMD)  
+- **rm -r foldername**: Delete a folder and its contents  
+- **cp source dest**: Copy files or directories  
+- **mv old new**: Move or rename files/folders  
 
 # Other useful git commands:
 
-- git init: Initialize a Git repo
-- git clone URL: Clone a repo
-- git status: See current repo status
-- git add . : Stage all changes
-- git commit -m "message": Commit changes
-- git push: Push to remote repo
-- git pull: Pull latest changes
-- git checkout branchname: Switch branches
+- **git init**: Initialize a Git repo  
+- **git clone URL**: Clone a repo  
+- **git status**: See current repo status  
+- **git add .**: Stage all changes  
+- **git commit -m "message"**: Commit changes  
+- **git push**: Push to remote repo  
+- **git pull**: Pull latest changes  
+- **git checkout branchname**: Switch branches
 
 # Testing instructions:
 - create a directory called tests
